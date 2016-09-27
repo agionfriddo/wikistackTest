@@ -225,12 +225,12 @@ describe('Page model', function () {
     });
   });
 
-  after(function(done) {
-    Page.destroy({
-      where: {}
-    })
-    .then(function() {
-      done()
-    })
-  })
+  // after(function(done) {
+  //   Page.destroy({
+  //     where: {}
+  //   })
+  //   .then(function() {
+  //     done()
+  //   })
+  // })
 });

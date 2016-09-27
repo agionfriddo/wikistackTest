@@ -38,11 +38,12 @@ app.use(function (err, req, res, next) {
 
 User.sync()
     .then(function () {
-        return Page.sync({force:true});
+        return Page.sync({force:false});
     })
     .then(function () {
         app.listen(3001, function () {
-            console.log('Server is listening on port 3001!');
+            // console.log('Server is listening on port 3001!');
         });
     });
 
+module.exports = app;
