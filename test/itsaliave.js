@@ -10,16 +10,7 @@ var User = models.User;
 
 describe('Page model', function () {
 
-  // before(function(done) {
-  //   Page.destroy({
-  //     where: {}
-  //   })
-  //   .then(function() {
-  //     done()
-  //   })
-  // })
-
-  xdescribe('Virtuals', function () {
+  describe('Virtuals', function () {
 
     // create test page
     var testPage;
@@ -46,7 +37,7 @@ describe('Page model', function () {
 
   });
 
-  xdescribe('Class methods', function () {
+  describe('Class methods', function () {
     beforeEach(function(done) {
       Page.create({
         title: "title",
@@ -72,12 +63,14 @@ describe('Page model', function () {
           expect(page).to.be.empty;
           done();
         })
-      }); 
+      });
     });
 
   })
 
   describe('Instance methods', function () {
+
+
 
     // creating all pages
     var testPage1 = Page.create({
@@ -109,8 +102,6 @@ describe('Page model', function () {
     // test findSimilar instance method
     describe('findSimilar', function () {
 
-
-
       it('never gets itself', function() {
         // find one page and its similar pages
         beforeEach(function(done){
@@ -120,7 +111,7 @@ describe('Page model', function () {
             }
           })
           .then(function(targetPage){
-            targetPage.findSimilar()
+            return targetPage.findSimilar()
             .then(function(foundPages){
               expect(foundPages).to.not.include(targetPage);
               done();
@@ -139,52 +130,107 @@ describe('Page model', function () {
             }
           })
           .then(function(targetPage){
-            targetPage.findSimilar()
+            return targetPage.findSimilar()
               .then(function(foundPages){ //[similarpage1, similarpage2]
                 expect(foundPages[0].tags).to.include("c");
                 done();
-              }) 
+              })
           })
         })
 
       });
 
-      xit('does not get other pages without any common tags', function(){
-        expect(foundPages).to.have.lengthOf(1);
-      });
+      it('does not get other pages without any common tags', function(){
+        beforeEach(function(done){
+          Page.findOne({
+            where: {
+              title: "title1"
+            }
+          })
+          .then(function(targetPage){
+            targetPage.findSimilar()
+            .then(function(foundPages){
+              expect(foundPages[0].tags).to.not.include("f");
+              done();
+            })
+          })
+        })
+      })
     });
+  });
 
+  describe('Validations', function () {
+    var testPage;
+    beforeEach(function() {
+      testPage = Page.build({
+        title: "title",
+        urlTitle: "title",
+        content: "# content",
+        status: "open",
+        tags: "tag1,tag2,tag3"
+      })
+    })
+    it('errors without title', function(done) {
+      testPage.title = null;
+      testPage.validate()
+      .then(function(errorObject) {
+        var error = errorObject.errors[0].path;
+        expect(error).to.equal('title')
+        done();
+      })
+    });
+    it('errors without content', function(done) {
+      testPage.content = null;
+      testPage.validate()
+      .then(function(errorObject) {
+        var error = errorObject.errors[0].path;
+        expect(error).to.equal('content')
+        done();
+      })
+    });
+    it('errors given an invalid status', function(done) {
+      Page.create({
+        title: "title",
+        urlTitle: "title",
+        content:"# content",
+        status: "wooooooo"
+      })
+      .catch(function(err) {
+        expect(err).to.not.be.null
+        done();
+      })
+      // testPage.validate()
+      // .then(function(errorObject) {
+      //   console.log(errorObject);
+      //   var error = errorObject.errors[0].path;
+      //   expect(error).to.equal('status')
+      //   done();
+      // })
+    });
   });
 
 
-  xdescribe('Validations', function () {
-    it('errors without title');
-    it('errors without content');
-    it('errors given an invalid status');
+  describe('Hooks', function () {
+    it('it sets urlTitle based on title before validating', function(done) {
+      var testPage =Page.build({
+                      title: "title",
+                      content: "content",
+                      status: "open"
+      })
+      testPage.save()
+      .then(function(page) {
+        expect(page.urlTitle).to.equal('title')
+        done()
+      })
+    });
   });
 
-
-  xdescribe('Hooks', function () {
-    it('it sets urlTitle based on title before validating');
-  });
-
+  after(function(done) {
+    Page.destroy({
+      where: {}
+    })
+    .then(function() {
+      done()
+    })
+  })
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
