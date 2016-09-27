@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon index.js",
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "chai-spies": "^0.7.1",
     "express": "^4.14.0",
     "marked": "^0.3.6",
     "morgan": "^1.7.0",
@@ -20,6 +22,8 @@
     "swig": "^1.4.2"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.0",
     "nodemon": "^1.10.0"
   }
 }
