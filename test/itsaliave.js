@@ -10,7 +10,7 @@ var User = models.User;
 
 describe('Page model', function () {
 
-  // beforeEach(function(done) {
+  // before(function(done) {
   //   Page.destroy({
   //     where: {}
   //   })
@@ -19,7 +19,9 @@ describe('Page model', function () {
   //   })
   // })
 
-  describe('Virtuals', function () {
+  xdescribe('Virtuals', function () {
+
+    // create test page
     var testPage;
     beforeEach(function() {
       testPage = Page.build({
@@ -32,7 +34,6 @@ describe('Page model', function () {
 
     describe('route', function () {
       it('returns the url_name prepended by "/wiki/"', function(){
-        testPage.urlTitle = 'title';
         expect(testPage.route.slice(0,6)).to.equal("/wiki/");
       });
     });
@@ -42,21 +43,20 @@ describe('Page model', function () {
         expect(testPage.renderedContent).to.equal('<h1 id="content">content</h1>\n')
       });
     });
+
   });
 
-
-  describe('Class methods', function () {
-      beforeEach(function(done) {
+  xdescribe('Class methods', function () {
+    beforeEach(function(done) {
       Page.create({
         title: "title",
         content: "# content",
         status: "open",
         tags: "tag1,tag2,tag3"
       })
-      .then(function() {
-        done();
-      })
+      .then(done());
     })
+
     describe('findByTag', function () {
       it('gets pages with the search tag', function(done) {
         Page.findByTag('tag1')
@@ -65,36 +65,40 @@ describe('Page model', function () {
           done();
         })
       });
+
       it('does not get pages without the search tag', function(done) {
         Page.findByTag('wrong')
         .then(function(page){
           expect(page).to.be.empty;
           done();
         })
-      });
+      }); 
     });
-  });
 
+  })
 
   describe('Instance methods', function () {
+
+    // creating all pages
     var testPage1 = Page.create({
       title: "title1",
       content: "content",
       status: "open",
-      tags: "tag1,tag2,tag3"
+      tags: "a,b,c"
     });
     var testPage2 = Page.create({
       title: "title2",
       content: "content",
       status: "open",
-      tags: "tag3,tag4,tag5"
+      tags: "c,d,e"
     });
     var testPage3 = Page.create({
       title: "title3",
       content: "content",
       status: "open",
-      tags: "tag6,tag7,tag8"
+      tags: "f,g,h"
     });
+
     beforeEach(function(done) {
       Promise.all([testPage1, testPage2, testPage3])
       .then(function() {
@@ -102,36 +106,85 @@ describe('Page model', function () {
       })
     })
 
+    // test findSimilar instance method
     describe('findSimilar', function () {
+
+
+
       it('never gets itself', function() {
-        Page.findOne({
-          where: {
-            title: "title1"
-          }
-        })
-        .then(function(row){
-          console.log('row',row)
-          row.findSimilar()
-          .then(function(arr){
-            expect(arr).to.not.include(row)
+        // find one page and its similar pages
+        beforeEach(function(done){
+          Page.findOne({
+            where: {
+              title: "title1"
+            }
+          })
+          .then(function(targetPage){
+            targetPage.findSimilar()
+            .then(function(foundPages){
+              expect(foundPages).to.not.include(targetPage);
+              done();
+            })
           })
         })
+
       })
-      it('gets other pages with any common tags');
-      it('does not get other pages without any common tags');
+
+      it('gets other pages with any common tags', function(){
+        // find one page and its similar pages
+        beforeEach(function(done){
+          Page.findOne({
+            where: {
+              title: "title1"
+            }
+          })
+          .then(function(targetPage){
+            targetPage.findSimilar()
+              .then(function(foundPages){ //[similarpage1, similarpage2]
+                expect(foundPages[0].tags).to.include("c");
+                done();
+              }) 
+          })
+        })
+
+      });
+
+      xit('does not get other pages without any common tags', function(){
+        expect(foundPages).to.have.lengthOf(1);
+      });
     });
+
   });
 
 
-  describe('Validations', function () {
+  xdescribe('Validations', function () {
     it('errors without title');
     it('errors without content');
     it('errors given an invalid status');
   });
 
 
-  describe('Hooks', function () {
+  xdescribe('Hooks', function () {
     it('it sets urlTitle based on title before validating');
   });
 
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
